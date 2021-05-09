@@ -15,6 +15,7 @@
 (global-auto-revert-mode t)
 (desktop-save-mode 1)
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 ;; THEMES
 (set-face-attribute 'default nil :font "Consolas-174" :height 120)
