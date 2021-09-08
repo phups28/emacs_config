@@ -1,9 +1,9 @@
 ;; WORKSPACE DIRECTORY
-(setq CURRENT_WORKSPACE_DIRECTORY "H:/Work/_proj") ;; projectile-discover-projects-in-directory
+(setq CURRENT_WORKSPACE_DIRECTORY "D:/_proj") ;; projectile-discover-projects-in-directory
 (setq default-directory CURRENT_WORKSPACE_DIRECTORY)
 
 ;; OPTIONS
-(menu-bar-mode -1) 
+(menu-bar-mode -1)
 (scroll-bar-mode -1)
 (tool-bar-mode -1)
 (tooltip-mode -1)
@@ -23,25 +23,32 @@
 (load-theme 'naysayer t)
 
 ;; CUSTOM KEY BINDING
-(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+;; (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+(define-key key-translation-map (kbd "ESC") (kbd "C-g"))
 (global-set-key (kbd "C-j") 'backward-char)
 (global-set-key (kbd "C-k") 'next-line)
 (global-set-key (kbd "C-l") 'forward-char)
-(global-set-key (kbd "C-i") 'previous-line) 
+(global-set-key (kbd "C-i") 'previous-line)
 (global-set-key (kbd "C-w") 'kill-line)
-(global-set-key (kbd "C-o") 'other-window)
-(global-set-key (kbd "C-/") 'delete-other-windows)
+(global-set-key (kbd "C-e") 'other-window)
+(global-set-key (kbd "C-\\") 'delete-other-windows)
 (global-set-key (kbd "C-p") 'delete-window)
 (global-set-key (kbd "C-b") 'switch-to-buffer)
-(global-set-key (kbd "C-q") 'move-beginning-of-line)
-(global-set-key (kbd "C-e") 'move-end-of-line)
+(global-set-key (kbd "C-u") 'move-beginning-of-line)
+(global-set-key (kbd "C-o") 'move-end-of-line)
+(global-set-key (kbd "C-h") 'comment-line)
+(global-set-key (kbd "C-a") 'mark-whole-buffer)
 (global-set-key (kbd "C-x j") 'previous-buffer)
 (global-set-key (kbd "C-x l") 'next-buffer)
 (global-set-key (kbd "C-x t") 'projectile-find-file-other-window)
-(global-set-key (kbd "C-,") (lambda () (interactive)(split-window-right) (other-window 1)))
-(global-set-key (kbd "C-.") (lambda () (interactive)(split-window-below) (other-window 1)))
-(global-set-key (kbd "C-]") (lambda () (interactive) (kill-buffer (current-buffer))))
+(global-set-key (kbd "C-n") (lambda () (interactive)(split-window-right) (other-window 1)))
+(global-set-key (kbd "C-,") (lambda () (interactive)(split-window-below) (other-window 1)))
+(global-set-key (kbd "C-/") (lambda () (interactive) (kill-buffer (current-buffer))))
 (global-set-key (kbd "C-t") 'projectile-find-file)
+(global-set-key (kbd "C-s") 'swiper)
+(global-set-key (kbd "C-<tab>") 'indent-rigidly)
+(add-hook 'minibuffer-setup-hook (lambda () (local-set-key (kbd "C-i") 'previous-line)))
+(add-hook 'minibuffer-setup-hook (lambda () (local-set-key (kbd "C-k") 'next-line)))
 
 (global-set-key [f5] 'projectile-compile-project)
 (global-set-key [f6] 'magit)
@@ -49,24 +56,24 @@
 (global-set-key [f9] 'global-display-line-numbers-mode)
 
 ;; TAB INDENT
-(setq tab-width 4) ;;(setq-default indent-tabs-mode t)
-(defvaralias 'c-basic-offset 'tab-width)
-(defvaralias 'cperl-indent-level 'tab-width)
+;; (setq tab-width 2) ;;(setq-default indent-tabs-mode t)
+;; (defvaralias 'c-basic-offset 'tab-width)
+;; (defvaralias 'cperl-indent-level 'tab-width)
 
-(defun my-insert-tab-char () "Insert a tab char. (ASCII 9, \t)" (interactive)(insert "\t"))
+(defun my-insert-tab-char () "Insert a tab char. (ASCII 9, \t)" (interactive)(insert "\t")
 (global-set-key (kbd "<tab>") 'my-insert-tab-char)
 
 (defun my-indent-region (N)
   (interactive "p")
   (if (use-region-p)
-      (progn (indent-rigidly (region-beginning) (region-end) (* N 4))
+      (progn (indent-rigidly (region-beginning) (region-end) (* N 2))
              (setq deactivate-mark nil))
     (self-insert-command N)))
 
 (defun my-unindent-region (N)
   (interactive "p")
   (if (use-region-p)
-      (progn (indent-rigidly (region-beginning) (region-end) (* N -4))
+      (progn (indent-rigidly (region-beginning) (region-end) (* N -2))
              (setq deactivate-mark nil))
     (self-insert-command N)))
 
@@ -111,17 +118,17 @@
 (use-package projectile
   :diminish projectile-mode
   :config (projectile-mode)
-  :custom ((projectile-completion-system 'ivy))
+  ;; :custom ((projectile-completion-system 'ivy))
   :bind-keymap
   ("C-f" . projectile-command-map)
   :init
   (when (file-directory-p CURRENT_WORKSPACE_DIRECTORY)
-    (setq projectile-project-search-path nil)))
+    (setq projectile-project-search-path nil))))
   ;; (setq projectile-switch-project-action #'projectile-dired))
 
 (use-package counsel-projectile
-  ;; :after projectile
-  ;; :bind (("C-M-p" . counsel-projectile-find-file))
+  :after projectile
+  :bind (("C-M-p" . counsel-projectile-find-file))
   :config
   (counsel-projectile-mode))
 
@@ -132,8 +139,8 @@
 (use-package ripgrep :ensure t)
 
 ;; C_SHARP MODE
-(use-package tree-sitter :ensure t)
-(use-package tree-sitter-langs :ensure t)
+;; (use-package tree-sitter :ensure t)
+;; (use-package tree-sitter-langs :ensure t)
 
 (use-package csharp-mode
   :ensure t
@@ -147,18 +154,21 @@
   )
 (add-hook 'csharp-mode-hook 'my-csharp-mode-hook)
 
-;; VUE MODE
-(use-package vue-mode :ensure t)	
-
-(add-hook 'mmm-mode-hook
-          (lambda ()
-            (set-face-background 'mmm-default-submode-face nil)))
-
 ;; RUST MODE
 (use-package rust-mode :ensure t)
 (require 'rust-mode)
 (add-hook 'rust-mode-hook
           (lambda () (setq indent-tabs-mode nil)))
+
+;; C MODE
+(setq-default c-basic-offset 4)
+(setq-default indent-tabs-mode t)
+(defun my-c-mode-hook ()
+  ;; enable the stuff you want for C# here
+  (electric-pair-mode 1)       ;; Emacs 24
+  (electric-pair-local-mode 1) ;; Emacs 25
+  )
+(add-hook 'c-mode-hook 'my-c-mode-hook)
 
 
 ;; ------DO NOT CHANGE---------------------------------------------------------------------------------------------------------------------------
@@ -176,4 +186,3 @@
  ;; If there is more than one, they won't work right.
  )
 ;; -----------------------------------------------------------------------------------------------------------------------------------------------
-
